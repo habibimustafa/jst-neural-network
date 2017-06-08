@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html ng-app="jst">
+<head>
+  <meta charset="utf-8">
+  <title>Habibi Mustafa ~ JST - Single Layer Perceptron</title>
+  <meta name="Description" content="JST - Single Layer Perceptron">
+  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+<body ng-controller="process">
+  <div class="container" style="margin-top:2em">
+    
+    <div class="row" ng-show="step==1">
+      <h3>Data Training</h3>
+      <div class="col-md-6">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Attibut</th>
+              <th>Nilai</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Banyaknya Input</td>
+              <td><input type="number" ng-model="sets.inputs" class="form-control" min="2"></td>
+            </tr>
+            <tr>
+              <td>Alpha</td>
+              <td><input type="number" ng-model="sets.alpha" class="form-control"></td>
+            </tr>
+            <tr>
+              <td>Teta</td>
+              <td><input type="number" ng-model="sets.teta" class="form-control" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Bias</td>
+              <td><input type="number" ng-model="sets.bias" class="form-control"></td>
+            </tr>
+            <tr ng-repeat="bot in sets.label(sets.inputs - 1)">
+              <td>Bobot W{{$index+1}}</td>
+              <td><input type="number" name="{{bot}}" ng-model="sets.bobot['w'+($index+1)]" class="form-control"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <table class="table">
+          <thead>
+            <tr>
+              <th ng-repeat="lb in sets.label(sets.inputs)">{{lb}}</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="stbl in sets.table" ng-init="row=$index">
+              <td ng-repeat="bl in stbl">{{stbl[sets.label(sets.inputs)[$index]]}}</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-md" ng-click="tbl.rem($index)">
+                  <i class="fa fa-trash-o"></i>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td ng-repeat="lb in sets.label(sets.inputs)">          
+                <input type="text" name="{{lb[$index]}}" ng-model="sets.baru[lb]" class="form-control" placeholder="{{lb}}">
+              </td>
+              <td>
+                <button type="button" class="btn btn-success btn-md" ng-click="tbl.add()">
+                  <i class="fa fa-plus"></i>
+                </button>
+              </td>          
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-lg btn-block btn-info btn-md" ng-click="hitung()">Hitung &raquo;</button>
+      <br/>
+      <br/>
+      <br/>
+    </div>
+
+    <div class="row" ng-show="step==2">
+      <h3>Hasil Training</h3>
+      <h4>{{sets.hasil}}</h4>
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-primary" ng-repeat="ep in sets.epoch">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#ep{{$index}}">Epoch ke-{{ep.epoch}}</a>
+            </h4>
+          </div>
+          <div id="ep{{$index}}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <!-- {{ep}} -->
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Epoch</th>
+                    <th>Alpha</th>
+                    <th>Teta</th>
+                    <th>Bias</th>
+                    <th ng-repeat="(a,b) in ep.pola[0].bobot">{{a}}</th>
+                    <th ng-repeat="(k,v) in ep.pola[0].data">{{sets.label(sets.inputs)[$index]}}</th>
+                    <th ng-repeat="(k,d) in ep.pola[0].kondisi">{{k}}</th>
+                    <th>Perbarui</th>
+                    <th>Bobot Baru</th>
+                    <th>Bias Baru</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="pl in ep.pola">
+                    <td>Epoch ke-{{ep.epoch}}</td>
+                    <td>{{ep.alpha}}</td>
+                    <td>{{ep.teta}}</td>
+                    <td>{{pl.bias}}</td>
+                    <td ng-repeat="bb in pl.bobot">{{bb}}</td>
+                    <td ng-repeat="dt in pl.data">{{pl.data[sets.label(sets.inputs)[$index]]}}</td>
+                    <td ng-repeat="kd in pl.kondisi">{{kd}}</td>
+                    <td>{{(pl.perbarui.status)?'Ya':'Tidak'}}</td>
+                    <td>{{pl.perbarui.bobot || '-'}}</td>
+                    <td>{{(pl.perbarui.bias=='0')?'0':(pl.perbarui.bias || '-')}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-lg btn-block btn-info btn-md" ng-click="step=3">Testing</button>
+      <br/>
+      <br/>
+      <br/>
+    </div>
+
+    <div class="row" ng-show="step==3">
+      <h3>Testing</h3>
+      <div class="col-md-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <th ng-repeat="lb in test.label(sets.inputs)">{{lb}}</th>
+              <th>Hasil</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td ng-repeat="lb in test.label(sets.inputs)">
+                <input type="text" name="{{lb[$index]}}" ng-model="test.inputs[lb]" class="form-control" placeholder="{{lb}}">
+              </td>
+              <td>
+                <input type="text" ng-model="test.hasil" class="form-control" placeholder="hasil" disabled="disabled"></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-lg btn-block btn-success btn-md" ng-click="test.run()">Test!</button>
+        <button type="button" class="btn btn-lg btn-block btn-info btn-md" onclick="location.href='./'">Coba Lagi</button>
+      </div>      
+    </div>
+
+  </div>
+
+  <!-- Libraries -->
+  <script src="js/angular.min.js"></script>
+  <script src="js/ui-bootstrap-tpls-0.11.2.min.js"></script>
+  <script src="js/angular-route.min.js"></script>
+  <script src="js/angular-animate.min.js"></script>
+
+  <!-- AngularJS custom codes -->
+  <script src="app/app.js"></script>
+
+  <!-- Some Bootstrap Helper Libraries -->
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/underscore.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

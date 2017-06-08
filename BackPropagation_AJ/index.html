@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html ng-app="jst">
+<head>
+  <meta charset="utf-8">
+  <title>Habibi Mustafa ~ JST - BackPropagation</title>
+  <meta name="Description" content="JST - BackPropagation">
+  <base href="http://app.habibimustafa.com/jst/BackPropagation/" target="_blank">
+  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+<body ng-controller="process">
+  <div class="container">
+    <h1 class="text-center">Pengenalan Pola Huruf (A - J)</h1>
+    <h3 class="text-center">Metode BackPropagation - Representasi Bipolar</h3>
+    
+    <div class="row">
+      <h3>Training</h3>
+      <div class="col-md-6">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Attibut</th>
+              <th>Nilai</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alpha</td>
+              <td><input type="number" ng-model="sets.alpha" class="form-control" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Teta</td>
+              <td><input type="number" ng-model="sets.teta" class="form-control" step="0.01"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Attibut</th>
+              <th>Nilai</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Epoch</td>
+              <td><input type="number" ng-model="sets.epoch" class="form-control" disabled></td>
+            </tr>
+            <tr>
+              <td>MSE</td>
+              <td><input type="number" ng-model="sets.mse" class="form-control" disabled></td>
+            </tr>
+          </tbody>
+        </table>      
+      </div>
+      <button type="button" class="btn btn-lg btn-block btn-info btn-md" ng-click="run.learn()">
+        Learning!  <i ng-show="sets.spin==true" class="fa fa-refresh fa-spin"></i>
+      </button>
+    </div>
+
+    <div class="row">
+      <h3>Testing <button type="button" class="btn btn-sm btn-danger btn-runtest" ng-click="run.btn_clear()">Clear</button></h3>
+      <div class="col-md-3">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(0)" ng-class="{'btn-info':sets.pola_biner[0]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(1)" ng-class="{'btn-info':sets.pola_biner[1]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(2)" ng-class="{'btn-info':sets.pola_biner[2]}"></td>
+            </tr>
+            <tr>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(3)" ng-class="{'btn-info':sets.pola_biner[3]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(4)" ng-class="{'btn-info':sets.pola_biner[4]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(5)" ng-class="{'btn-info':sets.pola_biner[5]}"></td>
+            </tr>
+            <tr>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(6)" ng-class="{'btn-info':sets.pola_biner[6]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(7)" ng-class="{'btn-info':sets.pola_biner[7]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(8)" ng-class="{'btn-info':sets.pola_biner[8]}"></td>
+            </tr>
+            <tr>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(9)" ng-class="{'btn-info':sets.pola_biner[9]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(10)" ng-class="{'btn-info':sets.pola_biner[10]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(11)" ng-class="{'btn-info':sets.pola_biner[11]}"></td>
+            </tr>
+            <tr>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(12)" ng-class="{'btn-info':sets.pola_biner[12]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(13)" ng-class="{'btn-info':sets.pola_biner[13]}"></td>
+              <td><button type="button" class="btn btn-block btn-huruf" ng-click="run.btn_toggle(14)" ng-class="{'btn-info':sets.pola_biner[14]}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-9">
+        <button type="button" class="btn btn-block btn-lg btn-info btn-runtest" ng-click="run.test(sets.pola_huruf)">Test!</button>
+        <div id="result_test">{{sets.result_test}}</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Libraries -->
+  <script src="js/angular.min.js"></script>
+  <script src="js/ui-bootstrap-tpls-0.11.2.min.js"></script>
+  <script src="js/angular-route.min.js"></script>
+  <script src="js/angular-animate.min.js"></script>
+
+  <!-- AngularJS custom codes -->
+  <!-- <script src="app/app.js"></script> -->
+  <script src="app/backprop.abcdefgh.js"></script>
+
+  <!-- Some Bootstrap Helper Libraries -->
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/underscore.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

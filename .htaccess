@@ -1,0 +1,8 @@
+ErrorDocument 404 /index.php
+DirectoryIndex index.php index.html index.htm
+Options +Indexes 
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+</IfModule>
